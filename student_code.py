@@ -1,11 +1,6 @@
 import common
 
 
-# global vars
-# length = 0
-# width = 0
-
-
 # object def for a spot in the maze
 class Node:
     def __init__(self, x, y):
@@ -21,11 +16,11 @@ def find_start(atlas):
                 return result
 
 
-def in_range(x, y, length, width):
-    return 0 <= x < length and 0 <= y < width
+def in_range(x, y):
+    return 0 <= x < (common.constants.MAP_HEIGHT - 1) and 0 <= y < (common.constants.MAP_WIDTH - 1)
 
 
-def expand(curr_node, atlas, length, width):
+def expand(curr_node, atlas):
     atlas[curr_node.x][curr_node.y] = 4  # this expanded node needs to get marked
 
     candidates = []
@@ -60,7 +55,7 @@ def expand(curr_node, atlas, length, width):
     print("candidates are")
     print(candidates)
     viable = list(filter(
-        lambda candidate: in_range(candidate[0], candidate[1], length, width) and atlas[candidate[0]][
+        lambda candidate: in_range(candidate[0], candidate[1]) and atlas[candidate[0]][
             candidate[1]] == 0,
         candidates))
 
@@ -68,12 +63,8 @@ def expand(curr_node, atlas, length, width):
     print(viable)
     return map(lambda candidate: Node(candidate[0], candidate[1]), viable)
 
-    # for candidate in candidates:#candidate is a potential set of surrounding coords
-    #  if x<width and y<length and map[candidate[0]][candidate[1]] != 1:#within bounds and not a wall
-    #    result.app
 
-
-def deep_walker(curr_node, atlas, width, length):
+def deep_walker(curr_node, atlas):
     print("indexing")
     print(curr_node.x, curr_node.y)
     print(atlas[curr_node.x][curr_node.y])
@@ -84,11 +75,11 @@ def deep_walker(curr_node, atlas, width, length):
     if atlas[curr_node.x][curr_node.y] == 3:
         atlas[curr_node.x][curr_node.y] = 5
         return True
-    for step in expand(curr_node, atlas, width, length):
+    for step in expand(curr_node, atlas):
 
-        if deep_walker(step, atlas, width, length):
+        if deep_walker(step, atlas):
             atlas[curr_node.x][curr_node.y] = 5
-            return deep_walker(step, atlas, width, length)
+            return deep_walker(step, atlas)
     return False
 
 
@@ -103,9 +94,6 @@ def df_search(atlas):
     # get start coords
     start_node = find_start(atlas)
 
-    # get dimensions of map
-    width = len(atlas)
-    length = len(atlas[0])
 
     # print("starting at")
     # rint(start_node.x)
@@ -115,7 +103,7 @@ def df_search(atlas):
     # print(frontier[0].x, frontier[0].y)
     # print("and")
     # print(frontier[1].x, frontier[1].y)
-    found = deep_walker(start_node, atlas, width, length)
+    found = deep_walker(start_node, atlas)
 
     return found
 
