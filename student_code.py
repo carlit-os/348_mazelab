@@ -20,12 +20,11 @@ def find_start(atlas, frontier):  # finds start node, adds to frontier, marks wi
                 return result
 
 
-def in_range(x, y):
+def in_range(x, y):  # checks if node is inside of the atlas
     return 0 <= x <= (common.constants.MAP_HEIGHT - 1) and 0 <= y <= (common.constants.MAP_WIDTH - 1)
 
 
-def expand(curr_node, atlas):
-
+def expand(curr_node, atlas):  # returns a list of 0 nodes counterclockwise from right of curr
     print("indexing atlas[%d][%d]" % (curr_node.x, curr_node.y))
     candidates = []
 
@@ -65,13 +64,12 @@ def expand(curr_node, atlas):
     print("we're left with")
     print(viable)
 
-
     return list(map(lambda candidate: Node(candidate[0], candidate[1]), viable))
 
 
 def df_search(atlas):
     found = False
-    # access the map using "map[y][x]"
+
     frontier = []
     # use a list as a stack
 
@@ -87,11 +85,12 @@ def df_search(atlas):
                 frontier.append(child)  # place child in frontier
 
                 parent[child.x][child.y] = Node(curr_node.x, curr_node.y)
-                  # adds back trace to parent arr
+                # adds back trace to parent arr
         else:
             atlas[curr_node.x][curr_node.y] = 5
+            #trace(curr_node, parent, atlas)  # draw line of fives
             return True
-
+    atlas[start_node.x][start_node.y] = 4  # there's no goal path
     return found
 
 
