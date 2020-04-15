@@ -9,7 +9,7 @@ class Node:
         self.y = y
 
 
-def find_start(atlas, frontier):  # finds start node, adds to frontier, marks with 5
+def find_start(atlas):  # finds start node, adds to frontier, marks with 5
     for rdx, row in enumerate(atlas):
         for cdx, num in enumerate(row):
             if num == 2:
@@ -86,7 +86,7 @@ def df_search(atlas):
     # use a list as a stack
     parent = [[0 for i in range(common.constants.MAP_WIDTH)] for j in range(common.constants.MAP_HEIGHT)]
 
-    start_node = find_start(atlas, frontier)  # mark visited
+    start_node = find_start(atlas)  # mark visited
     frontier.append(start_node) # add to frontier
     while frontier:
         curr_node = frontier.pop()
@@ -114,7 +114,7 @@ def bf_search(atlas):
 
     parent = [[0 for i in range(common.constants.MAP_WIDTH)] for j in range(common.constants.MAP_HEIGHT)]
 
-    start_node = find_start(atlas, frontier)  # mark visited
+    start_node = find_start(atlas)  # mark visited
     frontier.put(start_node)
 
     while not frontier.empty():
