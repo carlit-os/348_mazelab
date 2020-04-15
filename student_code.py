@@ -1,4 +1,5 @@
 import common
+from queue import Queue  # needed for bfs, otherwise readjusting lists is O(n)
 
 
 # object def for a spot in the maze
@@ -15,7 +16,6 @@ def find_start(atlas, frontier):  # finds start node, adds to frontier, marks wi
                 result = Node(rdx, cdx)
 
                 atlas[result.x][result.y] = 5
-                frontier.append(result)
 
                 return result
 
@@ -37,44 +37,44 @@ def trace(curr_node, parent, atlas):
 
 
 def expand(curr_node, atlas):  # returns a list of 0 nodes counterclockwise from right of curr
-    print("indexing atlas[%d][%d]" % (curr_node.x, curr_node.y))
+    # print("indexing atlas[%d][%d]" % (curr_node.x, curr_node.y))
     candidates = []
 
     curr_node.x = curr_node.x - 1
     candidates.append([curr_node.x, curr_node.y])  # space above of currnode
-    print("checking right")
-    print("indexed atlas[%d][%d]" % (curr_node.x, curr_node.y))
+    # print("checking right")
+    # print("indexed atlas[%d][%d]" % (curr_node.x, curr_node.y))
 
     curr_node.y = curr_node.y - 1
     curr_node.x = curr_node.x + 1  # space left of currnode
     candidates.append([curr_node.x, curr_node.y])
-    print("checking above")
-    print("indexed atlas[%d][%d]" % (curr_node.x, curr_node.y))
+    # print("checking above")
+    # print("indexed atlas[%d][%d]" % (curr_node.x, curr_node.y))
 
     curr_node.y = curr_node.y + 1
     curr_node.x = curr_node.x + 1
     candidates.append([curr_node.x, curr_node.y])  # space below currnode
-    print("checking left")
-    print("indexed atlas[%d][%d]" % (curr_node.x, curr_node.y))
+    # print("checking left")
+    # print("indexed atlas[%d][%d]" % (curr_node.x, curr_node.y))
 
     curr_node.x = curr_node.x - 1
     curr_node.y = curr_node.y + 1  # space right of currnode
     candidates.append([curr_node.x, curr_node.y])
-    print("checking right")
-    print("indexed atlas[%d][%d]" % (curr_node.x, curr_node.y))
+    # ("checking right")
+    # print("indexed atlas[%d][%d]" % (curr_node.x, curr_node.y))
 
     curr_node.y = curr_node.y - 1  # set currnode back where it belongs
-    print("left currnode at atlas[%d][%d]" % (curr_node.x, curr_node.y))
+    # print("left currnode at atlas[%d][%d]" % (curr_node.x, curr_node.y))
 
-    print("candidates are")
-    print(candidates)
+    # ("candidates are")
+    # print(candidates)
     viable = list(filter(
         lambda candidate: in_range(candidate[0], candidate[1]) and (atlas[candidate[0]][candidate[1]] == 0 or
                                                                     atlas[candidate[0]][candidate[1]] == 3),
         candidates))
 
-    print("we're left with")
-    print(viable)
+    # print("we're left with")
+    # print(viable)
 
     return list(map(lambda candidate: Node(candidate[0], candidate[1]), viable))
 
@@ -86,8 +86,8 @@ def df_search(atlas):
     # use a list as a stack
     parent = [[0 for i in range(common.constants.MAP_WIDTH)] for j in range(common.constants.MAP_HEIGHT)]
 
-    start_node = find_start(atlas, frontier)  # add to frontier and mark visited
-
+    start_node = find_start(atlas, frontier)  # mark visited
+    frontier.append(start_node) # add to frontier
     while frontier:
         curr_node = frontier.pop()
         if atlas[curr_node.x][curr_node.y] != 3:
@@ -109,8 +109,32 @@ def df_search(atlas):
 
 def bf_search(atlas):
     found = False
-    # PUT YOUR CODE HERE
-    # access the map using "map[y][x]"
-    # y between 0 and common.constants.MAP_HEIGHT-1
-    # x between 0 and common.constants.MAP_WIDTH-1
+
+    frontier = Queue()
+
+    parent = [[0 for i in range(common.constants.MAP_WIDTH)] for j in range(common.constants.MAP_HEIGHT)]
+
+    start_node = find_start(atlas, frontier)  # mark visited
+    frontier.put(start_node)
+
+    while not frontier.empty():
+        curr_node = frontier.get()
+        if atlas[curr_node.x][curr_node.y] != 3:
+            if curr_node is not start_node:
+                atlas[curr_node.x][curr_node.y] = 4  # mark as visited
+            for child in expand(curr_node, atlas):
+                frontier.put(child)  # place child in frontier
+
+                parent[child.x][child.y] = [curr_node.x, curr_node.y]
+                # adds back trace to parent arr
+        else:
+            # parent[child.x][child.y] = [curr_node.x, curr_node.y]
+            while not frontier.empty():
+                drain = frontier.get()
+                atlas[drain.x][drain.y] = 4
+
+            atlas[curr_node.x][curr_node.y] = 5
+            trace(curr_node, parent, atlas)  # draw line of fives
+            return True
+    atlas[start_node.x][start_node.y] = 4  # there's no goal path
     return found
