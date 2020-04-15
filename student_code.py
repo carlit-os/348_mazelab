@@ -25,7 +25,7 @@ def in_range(x, y):
 
 
 def expand(curr_node, atlas):
-    # atlas[curr_node.x][curr_node.y] = 4  # this expanded node needs to get marked
+
     print("indexing atlas[%d][%d]" % (curr_node.x, curr_node.y))
     candidates = []
 
@@ -64,8 +64,7 @@ def expand(curr_node, atlas):
 
     print("we're left with")
     print(viable)
-    #for step in viable:
-    #    atlas[step[0]][step[1]] = 4 # this prevents the goal from ever being seen
+
 
     return list(map(lambda candidate: Node(candidate[0], candidate[1]), viable))
 
@@ -91,14 +90,13 @@ def df_search(atlas):
                   # adds back trace to parent arr
         else:
             atlas[curr_node.x][curr_node.y] = 5
-            print("ye this runs bruv")
             return True
 
     return found
 
 
 def bf_search(atlas):
-    found = False;
+    found = False
     # PUT YOUR CODE HERE
     # access the map using "map[y][x]"
     # y between 0 and common.constants.MAP_HEIGHT-1
