@@ -24,6 +24,18 @@ def in_range(x, y):  # checks if node is inside of the atlas
     return 0 <= x <= (common.constants.MAP_HEIGHT - 1) and 0 <= y <= (common.constants.MAP_WIDTH - 1)
 
 
+def trace(curr_node, parent, atlas):
+    # curr_node is the goal node
+
+    while parent[curr_node.x][curr_node.y] != 0:  # while we haven't gotten back to start
+
+        parentx = parent[curr_node.x][curr_node.y][0]  # previous coordinates
+        parenty = parent[curr_node.x][curr_node.y][1]
+
+        atlas[parentx][parenty] = 5  # breadtrail of correct path
+        curr_node = Node(parentx, parenty)
+
+
 def expand(curr_node, atlas):  # returns a list of 0 nodes counterclockwise from right of curr
     print("indexing atlas[%d][%d]" % (curr_node.x, curr_node.y))
     candidates = []
@@ -72,8 +84,8 @@ def df_search(atlas):
 
     frontier = []
     # use a list as a stack
+    parent = [[0 for i in range(common.constants.MAP_WIDTH)] for j in range(common.constants.MAP_HEIGHT)]
 
-    parent = [[None] * common.constants.MAP_WIDTH] * common.constants.MAP_HEIGHT
     start_node = find_start(atlas, frontier)  # add to frontier and mark visited
 
     while frontier:
@@ -84,11 +96,12 @@ def df_search(atlas):
             for child in expand(curr_node, atlas):
                 frontier.append(child)  # place child in frontier
 
-                parent[child.x][child.y] = Node(curr_node.x, curr_node.y)
+                parent[child.x][child.y] = [curr_node.x, curr_node.y]
                 # adds back trace to parent arr
         else:
+            # parent[child.x][child.y] = [curr_node.x, curr_node.y]
             atlas[curr_node.x][curr_node.y] = 5
-            #trace(curr_node, parent, atlas)  # draw line of fives
+            trace(curr_node, parent, atlas)  # draw line of fives
             return True
     atlas[start_node.x][start_node.y] = 4  # there's no goal path
     return found
