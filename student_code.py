@@ -29,30 +29,30 @@ def expand(curr_node, atlas):
     print("indexing atlas[%d][%d]" % (curr_node.x, curr_node.y))
     candidates = []
 
-    curr_node.y = curr_node.y + 1
-    candidates.append([curr_node.x, curr_node.y])  # space right of currnode
+    curr_node.x = curr_node.x - 1
+    candidates.append([curr_node.x, curr_node.y])  # space above of currnode
     print("checking right")
     print("indexed atlas[%d][%d]" % (curr_node.x, curr_node.y))
 
     curr_node.y = curr_node.y - 1
-    curr_node.x = curr_node.x - 1  # space above of currnode
+    curr_node.x = curr_node.x + 1  # space left of currnode
     candidates.append([curr_node.x, curr_node.y])
     print("checking above")
     print("indexed atlas[%d][%d]" % (curr_node.x, curr_node.y))
 
-    curr_node.y = curr_node.y - 1
+    curr_node.y = curr_node.y + 1
     curr_node.x = curr_node.x + 1
-    candidates.append([curr_node.x, curr_node.y])  # space left of currnode
+    candidates.append([curr_node.x, curr_node.y])  # space below currnode
     print("checking left")
     print("indexed atlas[%d][%d]" % (curr_node.x, curr_node.y))
 
-    curr_node.x = curr_node.x + 1
-    curr_node.y = curr_node.y + 1  # space below of currnode
+    curr_node.x = curr_node.x - 1
+    curr_node.y = curr_node.y + 1  # space right of currnode
     candidates.append([curr_node.x, curr_node.y])
     print("checking right")
     print("indexed atlas[%d][%d]" % (curr_node.x, curr_node.y))
 
-    curr_node.y = curr_node.x - 1  # set currnode back where it belongs
+    curr_node.y = curr_node.y - 1  # set currnode back where it belongs
     print("left currnode at atlas[%d][%d]" % (curr_node.x, curr_node.y))
 
     print("candidates are")
@@ -70,28 +70,6 @@ def expand(curr_node, atlas):
     return list(map(lambda candidate: Node(candidate[0], candidate[1]), viable))
 
 
-def deep_walker(curr_node, atlas):
-    print("indexing", curr_node.x, curr_node.y)
-    # print(curr_node.y, curr_node.x)
-    # print(atlas[curr_node.x][curr_node.y])
-
-    # print("indexing atlas[8],[10]")
-    # print(atlas[curr_node.y][curr_node.x]) # this goes out of range
-
-    if atlas[curr_node.x][curr_node.y] == 3:
-        print("atlas[%d][%d] is the goal changing to five" % (curr_node.x, curr_node.y))
-        atlas[curr_node.x][curr_node.y] = 5
-        return Node(curr_node.x, curr_node.y)
-    for step in expand(curr_node, atlas):
-        if deep_walker(step, atlas):
-            # atlas[curr_node.x][curr_node.y] = 5
-            print("ye bruv this runs")
-            # return Node(curr_node.x, curr_node.y)
-            # return deep_walker(step, atlas)
-
-    return False
-
-
 def df_search(atlas):
     found = False
     # access the map using "map[y][x]"
@@ -99,13 +77,13 @@ def df_search(atlas):
     # use a list as a stack
 
     parent = [[None] * common.constants.MAP_WIDTH] * common.constants.MAP_HEIGHT
-    find_start(atlas, frontier)  # add to frontier and mark visited
+    start_node = find_start(atlas, frontier)  # add to frontier and mark visited
 
     while frontier:
         curr_node = frontier.pop()
         if atlas[curr_node.x][curr_node.y] != 3:
-
-            atlas[curr_node.x][curr_node.y] = 4  # mark as visited
+            if curr_node is not start_node:
+                atlas[curr_node.x][curr_node.y] = 4  # mark as visited
             for child in expand(curr_node, atlas):
                 frontier.append(child)  # place child in frontier
 
